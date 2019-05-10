@@ -13,18 +13,33 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
-  try {
-    const project = await Projects.getProjectById(req.params.id)
-    if (project) {
-      res.status(200).json(project)
-    } else {
-      res.status(404).json({
-        message: 'Project not found'
-      })
-    }
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' })
-  }
+  const { id } = req.params;
+  db('projects')
+    .where({ id })
+    .first()
+    .then(projects => {
+      db('actions')
+        .where({ 'project_id': id })
+        .then(actions => {
+          projects.actions = actions;
+          return res.status(200).json(projects)
+        })
+    })
+    .catch(err => {
+      res.status(500).json({ message: 'Server error' })
+    })
+  // try {
+  //   const project = await Projects.getProjectById(req.params.id)
+  //   if (project) {
+  //     res.status(200).json(project)
+  //   } else {
+  //     res.status(404).json({
+  //       message: 'Project not found'
+  //     })
+  //   }
+  // } catch (err) {
+  //   res.status(500).json({ message: 'Server error' })
+  // }
 })
 
 router.get('/:id/actions', (req, res) => {
