@@ -30,7 +30,7 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/actions', (req, res) => {
   db('projects')
     .join('actions', 'projects.id', 'actions.project_id')
-    .select('projects.name', 'actions.name')
+    .select('projects.name', 'actions.name', 'actions.notes', 'actions.completed')
     .where({ project_id: req.params.id })
     .then(actions => {
       res.status(200).json(actions)
